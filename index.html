@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sire-Andy Xchange | Global Crypto & Fiat Converter</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-dark: #020617;
+            --accent-cyan: #22d3ee;
+            --accent-yellow: #facc15;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --up-color: #4ade80;
+            --down-color: #f87171;
+            --transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--primary-dark);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(30, 64, 175, 0.3) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(124, 58, 237, 0.2) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            overflow-x: hidden;
+        }
+
+        /* --- Header --- */
+        .app-header {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .logo-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-main {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            background: linear-gradient(to right, #fff, var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-sub {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.6rem;
+            color: var(--accent-cyan);
+            font-weight: 400;
+            font-style: italic;
+            margin-top: -8px;
+            letter-spacing: 1px;
+        }
+
+        .service-badge {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            padding: 8px 16px;
+            border-radius: 12px;
+            color: var(--accent-yellow);
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            animation: pulse 3s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); border-color: var(--glass-border); }
+            50% { transform: scale(1.05); border-color: rgba(250, 204, 21, 0.4); }
+        }
+
+        /* --- Ticker --- */
+        .ticker-wrap {
+            width: 100vw;
+            background: rgba(0,0,0,0.4);
+            padding: 12px 0;
+            margin-bottom: 2rem;
+            border-top: 1px solid var(--glass-border);
+            border-bottom: 1px solid var(--glass-border);
+            overflow: hidden;
+        }
+
+        .ticker {
+            display: inline-block;
+            white-space: nowrap;
+            animation: tickerScroll 40s linear infinite;
+        }
+
+        @keyframes tickerScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .ticker-item {
+            display: inline-flex;
+            align-items: center;
+            padding: 0 40px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .ticker-item .pair { color: var(--text-dim); margin-right: 10px; }
+        .ticker-item .up { color: var(--up-color); }
+        .ticker-item .down { color: var(--down-color); }
+
+        /* --- Main Card --- */
+        .converter-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(20px);
+            width: 100%;
+            max-width: 500px;
+            padding: 2.5rem;
+            border-radius: 32px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            margin-bottom: 2rem;
+        }
+
+        .input-group label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-dim);
+            margin-bottom: 0.75rem;
+            display: block;
+            letter-spacing: 0.05em;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--glass-border);
+            padding: 1.25rem;
+            border-radius: 16px;
+            color: #fff;
+            font-size: 1.75rem;
+            font-weight: 700;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .input-wrapper input:focus {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.1);
+        }
+
+        .currency-selectors {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .select-box {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--glass-border);
+            transition: var(--transition);
+        }
+
+        .select-box:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255,255,255,0.2);
+        }
+
+        .select-box select {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .select-box select option { background: #0f172a; color: #fff; }
+
+        .icon-symbol {
+            width: 36px;
+            height: 36px;
+            margin-right: 15px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .swap-btn {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--accent-cyan);
+            color: var(--primary-dark);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            border: 6px solid #0f172a;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            transition: var(--transition);
+        }
+
+        .swap-btn:hover {
+            transform: translate(-50%, -50%) rotate(180deg) scale(1.1);
+            background: #fff;
+        }
+
+        /* --- Result --- */
+        .result-box {
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%);
+            border-radius: 24px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid var(--glass-border);
+        }
+
+        #rate-text { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 5px; }
+
+        #converted-val {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: var(--accent-yellow);
+            letter-spacing: -1px;
+            word-break: break-all;
+        }
+
+        /* --- Services (Clickable Buttons) --- */
+        .extra-services {
+            width: 100%;
+            max-width: 500px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .service-item-btn {
+            background: var(--glass);
+            padding: 1.25rem 0.5rem;
+            border-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            border: 1px solid var(--glass-border);
+            font-size: 0.65rem;
+            font-weight: 700;
+            gap: 8px;
+            color: var(--text-main);
+            text-decoration: none;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .service-item-btn i { 
+            color: var(--accent-cyan); 
+            font-size: 1.3rem; 
+            transition: var(--transition);
+        }
+
+        .service-item-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-5px);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 10px 20px rgba(34, 211, 238, 0.1);
+        }
+
+        .service-item-btn:hover i {
+            transform: scale(1.2);
+            color: var(--accent-yellow);
+        }
+
+        /* --- Footer Buttons (Animated) --- */
+        .footer-contact {
+            width: 100%;
+            max-width: 500px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .contact-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            animation: buttonFloat 4s ease-in-out infinite;
+        }
+
+        .contact-btn.social {
+            animation-delay: 2s; /* Staggered float */
+        }
+
+        @keyframes buttonFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .contact-btn.whatsapp {
+            background: #25d366;
+            color: #fff;
+            box-shadow: 0 10px 20px rgba(37, 211, 102, 0.2);
+        }
+
+        .contact-btn.social {
+            background: #fff;
+            color: #000;
+            box-shadow: 0 10px 20px rgba(255, 255, 255, 0.05);
+        }
+
+        .contact-btn:hover {
+            animation-play-state: paused;
+            transform: translateY(-12px) scale(1.02);
+            filter: brightness(1.1);
+        }
+
+        .contact-btn:hover i {
+            animation: iconWiggle 0.5s ease-in-out infinite;
+        }
+
+        @keyframes iconWiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-15deg); }
+            75% { transform: rotate(15deg); }
+        }
+
+        /* --- Utils --- */
+        .loader {
+            display: none;
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(250, 204, 21, 0.1);
+            border-top: 3px solid var(--accent-yellow);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 10px auto;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        .loading .loader { display: block; }
+        .loading #converted-val, .loading #rate-text { display: none; }
+
+        @media (max-width: 480px) {
+            .converter-card { padding: 1.5rem; }
+            .extra-services { grid-template-columns: 1fr; }
+            .footer-contact { grid-template-columns: 1fr; }
+            .logo-main { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="app-header">
+        <div class="logo-container">
+            <span class="logo-main">Sire-Andy</span>
+            <span class="logo-sub">Xchange</span>
+        </div>
+        <div class="service-badge">
+            <span>24/7</span>
+            <span style="font-size: 0.5rem; opacity: 0.7;">Active</span>
+        </div>
+    </header>
+
+    <div class="ticker-wrap">
+        <div class="ticker" id="market-ticker"></div>
+    </div>
+
+    <main class="converter-card" id="main-card">
+        <div class="input-group">
+            <label>Amount to convert</label>
+            <div class="input-wrapper">
+                <input type="number" id="amount" value="1.00" step="any">
+            </div>
+        </div>
+
+        <div class="currency-selectors">
+            <div class="select-box">
+                <img src="" id="from-flag" class="icon-symbol">
+                <select id="from-currency"></select>
+            </div>
+
+            <div class="swap-btn" id="swap-btn">
+                <i class="fas fa-exchange-alt"></i>
+            </div>
+
+            <div class="select-box">
+                <img src="" id="to-flag" class="icon-symbol">
+                <select id="to-currency"></select>
+            </div>
+        </div>
+
+        <div class="result-box" id="result-container">
+            <div class="loader"></div>
+            <div id="rate-text">Gathering live data...</div>
+            <div id="converted-val">---</div>
+            <div style="font-size: 0.75rem; color: var(--accent-cyan); margin-top: 15px; font-weight: 500;" id="last-update"></div>
+        </div>
+    </main>
+
+    <section class="extra-services">
+        <a href="https://wa.me/2347084410588?text=Hello,%20I%20want%20to%20buy%20Gas%20Fees." target="_blank" class="service-item-btn">
+            <i class="fas fa-gas-pump"></i>
+            <span>BUY GAS FEES</span>
+        </a>
+        <a href="https://wa.me/2347084410588?text=Hello,%20I%20want%20to%20Exchange%20Crypto/Currency." target="_blank" class="service-item-btn">
+            <i class="fas fa-comments-dollar"></i>
+            <span>EXCHANGE ASSETS</span>
+        </a>
+        <a href="https://wa.me/2347084410588?text=Hello,%20I%20want%20to%20redeem%20a%20Gift%20Card." target="_blank" class="service-item-btn">
+            <i class="fas fa-gift"></i>
+            <span>REDEEM GIFT CARDS</span>
+        </a>
+    </section>
+
+    <footer class="footer-contact">
+        <a href="https://wa.me/2347084410588" target="_blank" class="contact-btn whatsapp">
+            <i class="fab fa-whatsapp"></i>
+            <span>WhatsApp</span>
+        </a>
+        <a href="https://x.com/lamsire-Andy" target="_blank" class="contact-btn social">
+            <i class="fab fa-x-twitter"></i>
+            <span>Twitter / X</span>
+        </a>
+    </footer>
+
+    <script>
+        const API_URL = 'https://api.coinbase.com/v2/exchange-rates';
+        const FLAG_BASE_URL = 'https://flagcdn.com/w80/';
+        const CRYPTO_ICON_URL = 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/32/color/';
+
+        const elements = {
+            amount: document.getElementById('amount'),
+            fromCurrency: document.getElementById('from-currency'),
+            toCurrency: document.getElementById('to-currency'),
+            fromFlag: document.getElementById('from-flag'),
+            toFlag: document.getElementById('to-flag'),
+            rateText: document.getElementById('rate-text'),
+            convertedVal: document.getElementById('converted-val'),
+            lastUpdate: document.getElementById('last-update'),
+            resultBox: document.getElementById('result-container'),
+            swapBtn: document.getElementById('swap-btn'),
+            ticker: document.getElementById('market-ticker')
+        };
+
+        const currencies = {
+            // --- Cryptocurrencies ---
+            "BTC": { type: 'crypto' },
+            "ETH": { type: 'crypto' },
+            "USDT": { type: 'crypto' },
+            "BNB": { type: 'crypto' },
+            "SOL": { type: 'crypto' },
+            "XRP": { type: 'crypto' },
+            "ADA": { type: 'crypto' },
+            "DOGE": { type: 'crypto' },
+            "TRX": { type: 'crypto' },
+            "DOT": { type: 'crypto' },
+            "LTC": { type: 'crypto' },
+            "LINK": { type: 'crypto' },
+            "SHIB": { type: 'crypto' },
+            "AVAX": { type: 'crypto' },
+            "MATIC": { type: 'crypto' },
+            "XLM": { type: 'crypto' },
+            "DAI": { type: 'crypto' },
+            "UNI": { type: 'crypto' },
+            "ATOM": { type: 'crypto' },
+            "XMR": { type: 'crypto' },
+            "NEAR": { type: 'crypto' },
+            "BCH": { type: 'crypto' },
+            "ALGO": { type: 'crypto' },
+            "VET": { type: 'crypto' },
+            "ICP": { type: 'crypto' },
+            "FIL": { type: 'crypto' },
+            
+            // --- Major Global Fiats ---
+            "USD": { type: 'fiat', country: 'us' },
+            "EUR": { type: 'fiat', country: 'eu' },
+            "GBP": { type: 'fiat', country: 'gb' },
+            "JPY": { type: 'fiat', country: 'jp' },
+            "CAD": { type: 'fiat', country: 'ca' },
+            "AUD": { type: 'fiat', country: 'au' },
+            "CNY": { type: 'fiat', country: 'cn' },
+            "INR": { type: 'fiat', country: 'in' },
+            "BRL": { type: 'fiat', country: 'br' },
+            "RUB": { type: 'fiat', country: 'ru' },
+            "KRW": { type: 'fiat', country: 'kr' },
+            "MXN": { type: 'fiat', country: 'mx' },
+            "CHF": { type: 'fiat', country: 'ch' },
+            "NZD": { type: 'fiat', country: 'nz' },
+            "SGD": { type: 'fiat', country: 'sg' },
+            "HKD": { type: 'fiat', country: 'hk' },
+            "SEK": { type: 'fiat', country: 'se' },
+            "NOK": { type: 'fiat', country: 'no' },
+            "DKK": { type: 'fiat', country: 'dk' },
+            "TRY": { type: 'fiat', country: 'tr' },
+            "SAR": { type: 'fiat', country: 'sa' },
+            "AED": { type: 'fiat', country: 'ae' },
+
+            // --- Africa ---
+            "NGN": { type: 'fiat', country: 'ng' },
+            "GHS": { type: 'fiat', country: 'gh' },
+            "ZAR": { type: 'fiat', country: 'za' },
+            "KES": { type: 'fiat', country: 'ke' },
+            "EGP": { type: 'fiat', country: 'eg' },
+            "MAD": { type: 'fiat', country: 'ma' },
+            "TND": { type: 'fiat', country: 'tn' },
+            "UGX": { type: 'fiat', country: 'ug' },
+            "RWF": { type: 'fiat', country: 'rw' },
+            "MUR": { type: 'fiat', country: 'mu' },
+            "XAF": { type: 'fiat', country: 'cm' },
+            "XOF": { type: 'fiat', country: 'sn' },
+            "ETB": { type: 'fiat', country: 'et' },
+
+            // --- Americas ---
+            "ARS": { type: 'fiat', country: 'ar' },
+            "COP": { type: 'fiat', country: 'co' },
+            "CLP": { type: 'fiat', country: 'cl' },
+            "PEN": { type: 'fiat', country: 'pe' },
+            "UYU": { type: 'fiat', country: 'uy' },
+
+            // --- Asia / Oceania ---
+            "IDR": { type: 'fiat', country: 'id' },
+            "MYR": { type: 'fiat', country: 'my' },
+            "PHP": { type: 'fiat', country: 'ph' },
+            "THB": { type: 'fiat', country: 'th' },
+            "VND": { type: 'fiat', country: 'vn' },
+            "TWD": { type: 'fiat', country: 'tw' },
+            "PKR": { type: 'fiat', country: 'pk' },
+            "BDT": { type: 'fiat', country: 'bd' },
+            "ILS": { type: 'fiat', country: 'il' },
+            "QAR": { type: 'fiat', country: 'qa' },
+            "KWD": { type: 'fiat', country: 'kw' },
+
+            // --- Europe (Non-Euro) ---
+            "PLN": { type: 'fiat', country: 'pl' },
+            "CZK": { type: 'fiat', country: 'cz' },
+            "HUF": { type: 'fiat', country: 'hu' },
+            "RON": { type: 'fiat', country: 'ro' },
+            "BGN": { type: 'fiat', country: 'bg' }
+        };
+
+        async function init() {
+            populateSelects();
+            setupEventListeners();
+            fetchRates();
+            initTicker();
+        }
+
+        function populateSelects() {
+            const sortedCodes = Object.keys(currencies).sort();
+            sortedCodes.forEach(code => {
+                elements.fromCurrency.add(new Option(code, code));
+                elements.toCurrency.add(new Option(code, code));
+            });
+            elements.fromCurrency.value = 'USDT';
+            elements.toCurrency.value = 'NGN';
+            updateFlags();
+        }
+
+        function updateFlags() {
+            const updateIcon = (selectEl, imgEl) => {
+                const code = selectEl.value;
+                const info = currencies[code];
+                if (info?.type === 'crypto') {
+                    imgEl.src = `${CRYPTO_ICON_URL}${code.toLowerCase()}.png`;
+                } else {
+                    imgEl.src = `${FLAG_BASE_URL}${info?.country || 'un'}.png`;
+                }
+                imgEl.onerror = () => { imgEl.src = `https://ui-avatars.com/api/?name=${code}&background=random&color=fff&bold=true`; };
+            };
+            updateIcon(elements.fromCurrency, elements.fromFlag);
+            updateIcon(elements.toCurrency, elements.toFlag);
+        }
+
+        async function fetchRates() {
+            const base = elements.fromCurrency.value;
+            elements.resultBox.classList.add('loading');
+            try {
+                const res = await fetch(`${API_URL}?currency=${base}`);
+                if (!res.ok) throw new Error();
+                const data = await res.json();
+                window.exchangeRates = data.data.rates;
+                updateUI();
+            } catch (err) {
+                elements.rateText.textContent = "Unable to fetch live rates.";
+                elements.convertedVal.textContent = "Error";
+            } finally {
+                elements.resultBox.classList.remove('loading');
+            }
+        }
+
+        function updateUI() {
+            const amt = parseFloat(elements.amount.value) || 0;
+            const target = elements.toCurrency.value;
+            const rate = parseFloat(window.exchangeRates?.[target]);
+
+            if (rate) {
+                const precision = rate < 0.001 ? 8 : (rate < 1 ? 4 : 2);
+                const result = (amt * rate).toLocaleString(undefined, { maximumFractionDigits: precision, minimumFractionDigits: precision > 2 ? precision : 2 });
+                
+                elements.rateText.textContent = `1 ${elements.fromCurrency.value} = ${rate.toLocaleString(undefined, {maximumFractionDigits: 8})} ${target}`;
+                elements.convertedVal.textContent = `${result} ${target}`;
+                
+                const now = new Date();
+                const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                elements.lastUpdate.textContent = `Market Live: ${dateStr} | ${timeStr}`;
+            }
+        }
+
+        function initTicker() {
+            const pairs = [
+                {p: 'BTC/USD', u: true}, {p: 'ETH/USD', u: true}, {p: 'USDT/NGN', u: false},
+                {p: 'SOL/USD', u: true}, {p: 'BNB/USD', u: false}, {p: 'XRP/USD', u: false},
+                {p: 'GBP/USD', u: true}, {p: 'EUR/USD', u: false}
+            ];
+            let html = '';
+            [...pairs, ...pairs, ...pairs].forEach(item => {
+                const change = (Math.random() * 3).toFixed(2);
+                html += `
+                    <div class="ticker-item">
+                        <span class="pair">${item.p}</span>
+                        <span class="${item.u ? 'up' : 'down'}">
+                            ${item.u ? '▲' : '▼'} ${change}%
+                        </span>
+                    </div>`;
+            });
+            elements.ticker.innerHTML = html;
+        }
+
+        function setupEventListeners() {
+            elements.amount.addEventListener('input', updateUI);
+            elements.fromCurrency.addEventListener('change', () => { updateFlags(); fetchRates(); });
+            elements.toCurrency.addEventListener('change', () => { updateFlags(); updateUI(); });
+            elements.swapBtn.addEventListener('click', () => {
+                const temp = elements.fromCurrency.value;
+                elements.fromCurrency.value = elements.toCurrency.value;
+                elements.toCurrency.value = temp;
+                updateFlags(); fetchRates();
+            });
+        }
+
+        init();
+    </script>
+</body>
+</html>
