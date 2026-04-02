@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sire-Andy CEXchange | Global Crypto & Fiat Converter</title>
+    <title>Sire-Andy Xchange | Global Crypto & Fiat Converter</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
     <!-- Font Awesome -->
@@ -541,7 +541,9 @@
                 elements.convertedVal.textContent = `${result} ${target}`;
                 
                 const now = new Date();
-                elements.lastUpdate.textContent = `Live: ${now.toLocaleTimeString()}`;
+                const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                elements.lastUpdate.textContent = `Market Live: ${dateStr} | ${timeStr}`;
             }
         }
 
