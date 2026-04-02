@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sire-Andy Xchange | Global Crypto & Fiat Converter</title>
+    <title>Sire-Andy CEXchange | Global Crypto & Fiat Converter</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
     <!-- Font Awesome -->
@@ -219,6 +219,7 @@
             margin-right: 15px;
             border-radius: 50%;
             border: 2px solid rgba(255,255,255,0.1);
+            object-fit: cover;
         }
 
         .swap-btn {
@@ -253,19 +254,23 @@
             padding: 1.5rem;
             text-align: center;
             border: 1px solid var(--glass-border);
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         #rate-text { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 5px; }
 
         #converted-val {
-            font-size: 2.4rem;
+            font-size: 2.2rem;
             font-weight: 800;
             color: var(--accent-yellow);
             letter-spacing: -1px;
             word-break: break-all;
         }
 
-        /* --- Services (Clickable Buttons) --- */
+        /* --- Services --- */
         .extra-services {
             width: 100%;
             max-width: 500px;
@@ -293,25 +298,14 @@
             cursor: pointer;
         }
 
-        .service-item-btn i { 
-            color: var(--accent-cyan); 
-            font-size: 1.3rem; 
-            transition: var(--transition);
-        }
-
+        .service-item-btn i { color: var(--accent-cyan); font-size: 1.3rem; }
         .service-item-btn:hover {
             background: rgba(255, 255, 255, 0.08);
             transform: translateY(-5px);
             border-color: var(--accent-cyan);
-            box-shadow: 0 10px 20px rgba(34, 211, 238, 0.1);
         }
 
-        .service-item-btn:hover i {
-            transform: scale(1.2);
-            color: var(--accent-yellow);
-        }
-
-        /* --- Footer Buttons (Animated) --- */
+        /* --- Footer --- */
         .footer-contact {
             width: 100%;
             max-width: 500px;
@@ -332,47 +326,10 @@
             text-decoration: none;
             font-size: 0.9rem;
             transition: var(--transition);
-            position: relative;
-            overflow: hidden;
-            animation: buttonFloat 4s ease-in-out infinite;
         }
 
-        .contact-btn.social {
-            animation-delay: 2s; /* Staggered float */
-        }
-
-        @keyframes buttonFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
-        }
-
-        .contact-btn.whatsapp {
-            background: #25d366;
-            color: #fff;
-            box-shadow: 0 10px 20px rgba(37, 211, 102, 0.2);
-        }
-
-        .contact-btn.social {
-            background: #fff;
-            color: #000;
-            box-shadow: 0 10px 20px rgba(255, 255, 255, 0.05);
-        }
-
-        .contact-btn:hover {
-            animation-play-state: paused;
-            transform: translateY(-12px) scale(1.02);
-            filter: brightness(1.1);
-        }
-
-        .contact-btn:hover i {
-            animation: iconWiggle 0.5s ease-in-out infinite;
-        }
-
-        @keyframes iconWiggle {
-            0%, 100% { transform: rotate(0deg); }
-            25% { transform: rotate(-15deg); }
-            75% { transform: rotate(15deg); }
-        }
+        .contact-btn.whatsapp { background: #25d366; color: #fff; }
+        .contact-btn.social { background: #fff; color: #000; }
 
         /* --- Utils --- */
         .loader {
@@ -389,13 +346,12 @@
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
         .loading .loader { display: block; }
-        .loading #converted-val, .loading #rate-text { display: none; }
+        .loading #converted-val, .loading #rate-text, .loading #last-update { display: none; }
 
         @media (max-width: 480px) {
             .converter-card { padding: 1.5rem; }
             .extra-services { grid-template-columns: 1fr; }
             .footer-contact { grid-template-columns: 1fr; }
-            .logo-main { font-size: 1.8rem; }
         }
     </style>
 </head>
@@ -426,7 +382,7 @@
 
         <div class="currency-selectors">
             <div class="select-box">
-                <img src="" id="from-flag" class="icon-symbol">
+                <img src="" id="from-flag" class="icon-symbol" alt="">
                 <select id="from-currency"></select>
             </div>
 
@@ -435,7 +391,7 @@
             </div>
 
             <div class="select-box">
-                <img src="" id="to-flag" class="icon-symbol">
+                <img src="" id="to-flag" class="icon-symbol" alt="">
                 <select id="to-currency"></select>
             </div>
         </div>
@@ -475,7 +431,10 @@
     </footer>
 
     <script>
-        const API_URL = 'https://api.coinbase.com/v2/exchange-rates';
+        // Updated Primary API (more browser friendly) and Backup
+        const API_URL_PRIMARY = 'https://api.coinbase.com/v2/exchange-rates';
+        const API_URL_SECONDARY = 'https://open.er-api.com/v6/latest/'; // Public fallback
+        
         const FLAG_BASE_URL = 'https://flagcdn.com/w80/';
         const CRYPTO_ICON_URL = 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/32/color/';
 
@@ -494,99 +453,14 @@
         };
 
         const currencies = {
-            // --- Cryptocurrencies ---
-            "BTC": { type: 'crypto' },
-            "ETH": { type: 'crypto' },
-            "USDT": { type: 'crypto' },
-            "BNB": { type: 'crypto' },
-            "SOL": { type: 'crypto' },
-            "XRP": { type: 'crypto' },
-            "ADA": { type: 'crypto' },
-            "DOGE": { type: 'crypto' },
-            "TRX": { type: 'crypto' },
-            "DOT": { type: 'crypto' },
-            "LTC": { type: 'crypto' },
-            "LINK": { type: 'crypto' },
-            "SHIB": { type: 'crypto' },
-            "AVAX": { type: 'crypto' },
-            "MATIC": { type: 'crypto' },
-            "XLM": { type: 'crypto' },
-            "DAI": { type: 'crypto' },
-            "UNI": { type: 'crypto' },
-            "ATOM": { type: 'crypto' },
-            "XMR": { type: 'crypto' },
-            "NEAR": { type: 'crypto' },
-            "BCH": { type: 'crypto' },
-            "ALGO": { type: 'crypto' },
-            "VET": { type: 'crypto' },
-            "ICP": { type: 'crypto' },
-            "FIL": { type: 'crypto' },
-            
-            // --- Major Global Fiats ---
-            "USD": { type: 'fiat', country: 'us' },
-            "EUR": { type: 'fiat', country: 'eu' },
-            "GBP": { type: 'fiat', country: 'gb' },
-            "JPY": { type: 'fiat', country: 'jp' },
-            "CAD": { type: 'fiat', country: 'ca' },
-            "AUD": { type: 'fiat', country: 'au' },
-            "CNY": { type: 'fiat', country: 'cn' },
-            "INR": { type: 'fiat', country: 'in' },
-            "BRL": { type: 'fiat', country: 'br' },
-            "RUB": { type: 'fiat', country: 'ru' },
-            "KRW": { type: 'fiat', country: 'kr' },
-            "MXN": { type: 'fiat', country: 'mx' },
-            "CHF": { type: 'fiat', country: 'ch' },
-            "NZD": { type: 'fiat', country: 'nz' },
-            "SGD": { type: 'fiat', country: 'sg' },
-            "HKD": { type: 'fiat', country: 'hk' },
-            "SEK": { type: 'fiat', country: 'se' },
-            "NOK": { type: 'fiat', country: 'no' },
-            "DKK": { type: 'fiat', country: 'dk' },
-            "TRY": { type: 'fiat', country: 'tr' },
-            "SAR": { type: 'fiat', country: 'sa' },
-            "AED": { type: 'fiat', country: 'ae' },
-
-            // --- Africa ---
-            "NGN": { type: 'fiat', country: 'ng' },
-            "GHS": { type: 'fiat', country: 'gh' },
-            "ZAR": { type: 'fiat', country: 'za' },
-            "KES": { type: 'fiat', country: 'ke' },
-            "EGP": { type: 'fiat', country: 'eg' },
-            "MAD": { type: 'fiat', country: 'ma' },
-            "TND": { type: 'fiat', country: 'tn' },
-            "UGX": { type: 'fiat', country: 'ug' },
-            "RWF": { type: 'fiat', country: 'rw' },
-            "MUR": { type: 'fiat', country: 'mu' },
-            "XAF": { type: 'fiat', country: 'cm' },
-            "XOF": { type: 'fiat', country: 'sn' },
-            "ETB": { type: 'fiat', country: 'et' },
-
-            // --- Americas ---
-            "ARS": { type: 'fiat', country: 'ar' },
-            "COP": { type: 'fiat', country: 'co' },
-            "CLP": { type: 'fiat', country: 'cl' },
-            "PEN": { type: 'fiat', country: 'pe' },
-            "UYU": { type: 'fiat', country: 'uy' },
-
-            // --- Asia / Oceania ---
-            "IDR": { type: 'fiat', country: 'id' },
-            "MYR": { type: 'fiat', country: 'my' },
-            "PHP": { type: 'fiat', country: 'ph' },
-            "THB": { type: 'fiat', country: 'th' },
-            "VND": { type: 'fiat', country: 'vn' },
-            "TWD": { type: 'fiat', country: 'tw' },
-            "PKR": { type: 'fiat', country: 'pk' },
-            "BDT": { type: 'fiat', country: 'bd' },
-            "ILS": { type: 'fiat', country: 'il' },
-            "QAR": { type: 'fiat', country: 'qa' },
-            "KWD": { type: 'fiat', country: 'kw' },
-
-            // --- Europe (Non-Euro) ---
-            "PLN": { type: 'fiat', country: 'pl' },
-            "CZK": { type: 'fiat', country: 'cz' },
-            "HUF": { type: 'fiat', country: 'hu' },
-            "RON": { type: 'fiat', country: 'ro' },
-            "BGN": { type: 'fiat', country: 'bg' }
+            "BTC": { type: 'crypto' }, "ETH": { type: 'crypto' }, "USDT": { type: 'crypto' },
+            "BNB": { type: 'crypto' }, "SOL": { type: 'crypto' }, "XRP": { type: 'crypto' },
+            "TRX": { type: 'crypto' }, "LTC": { type: 'crypto' }, "DOGE": { type: 'crypto' },
+            "USD": { type: 'fiat', country: 'us' }, "EUR": { type: 'fiat', country: 'eu' },
+            "GBP": { type: 'fiat', country: 'gb' }, "NGN": { type: 'fiat', country: 'ng' },
+            "GHS": { type: 'fiat', country: 'gh' }, "ZAR": { type: 'fiat', country: 'za' },
+            "CAD": { type: 'fiat', country: 'ca' }, "AUD": { type: 'fiat', country: 'au' },
+            "CNY": { type: 'fiat', country: 'cn' }, "KES": { type: 'fiat', country: 'ke' }
         };
 
         async function init() {
@@ -625,18 +499,33 @@
         async function fetchRates() {
             const base = elements.fromCurrency.value;
             elements.resultBox.classList.add('loading');
+            
             try {
-                const res = await fetch(`${API_URL}?currency=${base}`);
-                if (!res.ok) throw new Error();
-                const data = await res.json();
+                // Try Coinbase first
+                let response = await fetch(`${API_URL_PRIMARY}?currency=${base}`);
+                if (!response.ok) throw new Error('Primary API failed');
+                
+                const data = await response.json();
                 window.exchangeRates = data.data.rates;
-                updateUI();
             } catch (err) {
-                elements.rateText.textContent = "Unable to fetch live rates.";
-                elements.convertedVal.textContent = "Error";
-            } finally {
-                elements.resultBox.classList.remove('loading');
+                console.warn("Coinbase API failed, trying fallback...", err);
+                try {
+                    // Fallback to secondary API
+                    let response = await fetch(`${API_URL_SECONDARY}${base}`);
+                    if (!response.ok) throw new Error('Secondary API failed');
+                    
+                    const data = await response.json();
+                    window.exchangeRates = data.rates;
+                } catch (fallbackErr) {
+                    elements.rateText.textContent = "Error connecting to servers.";
+                    elements.convertedVal.textContent = "Check Connection";
+                    elements.resultBox.classList.remove('loading');
+                    return;
+                }
             }
+            
+            updateUI();
+            elements.resultBox.classList.remove('loading');
         }
 
         function updateUI() {
@@ -652,27 +541,22 @@
                 elements.convertedVal.textContent = `${result} ${target}`;
                 
                 const now = new Date();
-                const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-                const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                elements.lastUpdate.textContent = `Market Live: ${dateStr} | ${timeStr}`;
+                elements.lastUpdate.textContent = `Live: ${now.toLocaleTimeString()}`;
             }
         }
 
         function initTicker() {
             const pairs = [
                 {p: 'BTC/USD', u: true}, {p: 'ETH/USD', u: true}, {p: 'USDT/NGN', u: false},
-                {p: 'SOL/USD', u: true}, {p: 'BNB/USD', u: false}, {p: 'XRP/USD', u: false},
-                {p: 'GBP/USD', u: true}, {p: 'EUR/USD', u: false}
+                {p: 'SOL/USD', u: true}, {p: 'GBP/USD', u: true}, {p: 'EUR/USD', u: false}
             ];
             let html = '';
-            [...pairs, ...pairs, ...pairs].forEach(item => {
+            [...pairs, ...pairs].forEach(item => {
                 const change = (Math.random() * 3).toFixed(2);
                 html += `
                     <div class="ticker-item">
                         <span class="pair">${item.p}</span>
-                        <span class="${item.u ? 'up' : 'down'}">
-                            ${item.u ? '▲' : '▼'} ${change}%
-                        </span>
+                        <span class="${item.u ? 'up' : 'down'}">${item.u ? '▲' : '▼'} ${change}%</span>
                     </div>`;
             });
             elements.ticker.innerHTML = html;
